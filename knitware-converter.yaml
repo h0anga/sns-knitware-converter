@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sns-knitware-converter
+spec:
+  containers:
+  - image: sns-knitware-converter:0.1.4
+    name: sns-knitware-converter
+    imagePullPolicy: Never
