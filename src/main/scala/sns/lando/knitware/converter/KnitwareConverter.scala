@@ -21,7 +21,7 @@ object KnitwareConverter extends App {
 
   private val props = new Properties()
 
-  props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092")
+  props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "10.103.3.240:9092")
   props.put("acks", "all")
   props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, KafkaSerializer)
   props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaSerializer)
@@ -30,7 +30,7 @@ object KnitwareConverter extends App {
   props.put(ConsumerConfig.GROUP_ID_CONFIG, this.getClass.getName)
 
   props.put(StreamsConfig.APPLICATION_ID_CONFIG, "sns-knitware-converter")
-  props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092")
+  props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "10.103.3.240:9092")
 
 
   val builder: StreamsBuilder = new StreamsBuilder
