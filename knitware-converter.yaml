@@ -7,3 +7,14 @@ spec:
   - image: sns-knitware-converter:0.1.4
     name: sns-knitware-converter
     imagePullPolicy: Never
+    env:
+      - name: KAFKA_BROKER_SERVER
+        valueFrom:
+          configMapKeyRef:
+            name: kafka-broker-config
+            key: KAFKA_BROKER_SERVER
+      - name: KAFKA_BROKER_PORT
+        valueFrom:
+          configMapKeyRef:
+            name: kafka-broker-config
+            key: KAFKA_BROKER_PORT
