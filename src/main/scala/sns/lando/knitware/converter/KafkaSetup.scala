@@ -1,52 +1,68 @@
 package sns.lando.knitware.converter
 
 import java.util.Properties
-import java.util.concurrent.TimeUnit
 
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.producer.ProducerConfig
-import org.apache.kafka.streams.scala.ImplicitConversions._
-import org.apache.kafka.streams.scala.Serdes._
-import org.apache.kafka.streams.scala.StreamsBuilder
-import org.apache.kafka.streams.scala.kstream.KStream
-import org.apache.kafka.streams.{KafkaStreams, StreamsConfig}
+
+//import com.typesafe.config.{Config, ConfigFactory}
+import com.typesafe.scalalogging.LazyLogging
+import org.apache.kafka.common.serialization._
+import org.apache.kafka.streams._
+import org.apache.kafka.streams.kstream.KStream
 
 class KafkaSetup(private val server: String, private val port: String) {
   private val lluStreamMessagesTopic = "incoming.op.msgs"
   private val switchModificationTopic = "switch.modification.instructions"
+
   private val KafkaDeserializer = "org.apache.kafka.common.serialization.StringDeserializer"
   private val KafkaSerializer = "org.apache.kafka.common.serialization.StringSerializer"
 
-  private val props = new Properties()
+  //  val configuration: Config = ConfigFactory.load()
 
-  var streams: KafkaStreams = _
+  private var stream: KafkaStreams = _
 
   def setUp(): Unit = {
-    val bootstrapServers = server + port
-    props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, KafkaSerializer)
-    props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaSerializer)
-    props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaDeserializer)
-    props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, KafkaDeserializer)
-    props.put(ConsumerConfig.GROUP_ID_CONFIG, this.getClass.getName)
 
-    props.put(StreamsConfig.APPLICATION_ID_CONFIG, "sns-knitware-converter")
-    props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, server + ":" + port)
+    val bootstrapServers = server + ":" + port
+    val builder = new StreamsBuilder
 
+    val streamingConfig = {
+      val settings = new Properties
+      settings.put(StreamsConfig.APPLICATION_ID_CONFIG, "sns-knitware-converter")
+      settings.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers)
+      // Specify default (de)serializers for record keys and for record values.
+      settings.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String.getClass.getName)
+      settings.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String.getClass.getName)
+      settings.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, KafkaSerializer)
+      settings.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaSerializer)
+      settings.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaDeserializer)
+      settings.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, KafkaDeserializer)
 
-    val builder: StreamsBuilder = new StreamsBuilder
-    val textLines: KStream[String, String] = builder.stream[String, String](lluStreamMessagesTopic)
+      settings
+    }
 
+    createConverterTopology(builder, lluStreamMessagesTopic, switchModificationTopic)
 
+    stream = new KafkaStreams(builder.build(), streamingConfig)
+
+    sys.addShutdownHook({
+      stream.close()
+    })
+
+    stream.start()
+  }
+
+  def createConverterTopology(builder: StreamsBuilder, input: String, output: String): Unit = {
+    // Read the input Kafka topic into a KStream instance.
+    val textLines: KStream[String, String] = builder.stream(input)
+//    val uppercasedWithMapValues: KStream[String, String] = textLines.mapValues(new String(_).toUpperCase().getBytes())
+//    uppercasedWithMapValues.to(output)
     textLines.mapValues(textLine => new KnitwareConverter().getXmlFor(textLine))
-      .to(switchModificationTopic)
-
-    streams = new KafkaStreams(builder.build(), props)
-    streams.start()
-    println("Completed setUp")
+      .to(output)
   }
 
   def tearDown(): Unit = {
-    println("In tearDown")
-    streams.close(10, TimeUnit.SECONDS)
+    stream.close()
   }
 }
