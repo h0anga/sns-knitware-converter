@@ -4,13 +4,15 @@ import scala.util.Properties
 
 object KnitwareConverterApp extends App {
 
-  val kafkabroker: String = Properties.envOrElse("KAFKA_BROKER_SERVER", "localhost")
-  val kafkabrokerPort: String = Properties.envOrElse("KAFKA_BROKER_PORT", "9092")
+  private val kafkabroker: String = Properties.envOrElse("KAFKA_BROKER_SERVER", "localhost")
+  private val kafkabrokerPort: String = Properties.envOrElse("KAFKA_BROKER_PORT", "9092")
+  private val lluStreamMessagesTopic = "incoming.op.msgs"
+  private val switchModificationTopic = "switch.modification.instructions"
+
   val kafkaSetup = new KafkaSetup(kafkabroker, kafkabrokerPort)
-  kafkaSetup.setUp()
+  kafkaSetup.start(lluStreamMessagesTopic, switchModificationTopic)
 
   sys.ShutdownHookThread {
-    kafkaSetup.tearDown()
+    kafkaSetup.shutDown()
   }
-
 }
