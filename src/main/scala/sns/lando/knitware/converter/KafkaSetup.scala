@@ -2,19 +2,11 @@ package sns.lando.knitware.converter
 
 import java.util.Properties
 
-import org.apache.kafka.clients.consumer.ConsumerConfig
-import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.common.serialization._
 import org.apache.kafka.streams._
 import org.apache.kafka.streams.scala.kstream.Consumed
 
 class KafkaSetup(private val server: String, private val port: String) {
-  private val lluStreamMessagesTopic = "incoming.op.msgs"
-  private val switchModificationTopic = "switch.modification.instructions"
-
-  private val KafkaStringSerializer = "org.apache.kafka.common.serialization.StringSerializer"
-  private val KafkaStringDeserializer = "org.apache.kafka.common.serialization.StringDeserializer"
-
   private implicit val stringSerde: Serde[String] = Serdes.String()
 
   private var stream: KafkaStreams = _

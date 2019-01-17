@@ -18,8 +18,6 @@ class KafkaSetupSpec extends FlatSpec with Matchers {
   private val outputTopic = "topic-out"
 
   private val kafkaMessageInKey = "key"
-  private val kafkaMessageInValue = "inputXmlMessage"
-
   private val streamingConfig = {
     val settings = new Properties
     settings.put(StreamsConfig.APPLICATION_ID_CONFIG, kafkaApplicationId)
@@ -29,7 +27,9 @@ class KafkaSetupSpec extends FlatSpec with Matchers {
     settings
   }
 
-  private val epectedOutput =
+  private val kafkaMessageInValue = "inputXmlMessage"
+
+  private val expectedOutput =
     """
       |<?xml version="1.0" encoding="UTF-8"?>
       |<switchServiceModificationInstruction switchServiceId="16" netstreamCorrelationId="33269793">
@@ -61,7 +61,7 @@ class KafkaSetupSpec extends FlatSpec with Matchers {
     val outputKafkaRecord: ProducerRecord[String, String] = topologyTestDriver.readOutput(outputTopic, keySerde.deserializer(), valueSerde.deserializer())
     val outputValue = outputKafkaRecord.value()
 
-    outputValue shouldEqual (epectedOutput)
+    outputValue shouldEqual (expectedOutput)
   }
 
 }
