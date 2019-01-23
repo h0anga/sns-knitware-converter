@@ -1,6 +1,6 @@
 package sns.lando.knitware.converter
 
-import java.util.Properties
+import java.util.{Properties, UUID}
 
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.producer.ProducerRecord
@@ -27,12 +27,18 @@ class KafkaSetupSpec extends FlatSpec with Matchers {
     settings
   }
 
-  private val kafkaMessageInValue = "inputXmlMessage"
+  private val netstreamCorrelationId = UUID.randomUUID().toString
+
+  private val kafkaMessageInValue =
+    s"""
+      |{"netstreamCorrelationId":"${netstreamCorrelationId}"}
+    """.stripMargin
+
 
   private val expectedOutput =
-    """
+    s"""
       |<?xml version="1.0" encoding="UTF-8"?>
-      |<switchServiceModificationInstruction switchServiceId="16" netstreamCorrelationId="33269793">
+      |<switchServiceModificationInstruction switchServiceId="16" netstreamCorrelationId="${netstreamCorrelationId}">
       |  <features>
       |    <callerDisplay active="true"/>
       |    <ringBack active="true"/>
