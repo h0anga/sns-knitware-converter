@@ -1,3 +1,3 @@
 package sns.lando.knitware.converter
 
-case class VoiceFeatures (netstreamCorrelationId: String)
+case class VoiceFeatures (orderId: String)

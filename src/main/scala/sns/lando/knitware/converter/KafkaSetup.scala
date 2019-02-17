@@ -39,6 +39,6 @@ class KafkaSetup(private val server: String, private val port: String) {
       .mapValues(line => new KnitwareConverter().getXmlFor(line))
       .to(outputTopicName)
 
-    return builder.build()
+    builder.build()
   }
 }

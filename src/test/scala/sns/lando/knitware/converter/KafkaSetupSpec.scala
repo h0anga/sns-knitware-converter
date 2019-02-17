@@ -27,18 +27,18 @@ class KafkaSetupSpec extends FlatSpec with Matchers {
     settings
   }
 
-  private val netstreamCorrelationId = UUID.randomUUID().toString
+  private val orderId = UUID.randomUUID().toString
 
   private val kafkaMessageInValue =
     s"""
-      |{"netstreamCorrelationId":"${netstreamCorrelationId}"}
+      |{"orderId":"$orderId"}
     """.stripMargin
 
 
   private val expectedOutput =
     s"""
       |<?xml version="1.0" encoding="UTF-8"?>
-      |<switchServiceModificationInstruction switchServiceId="16" netstreamCorrelationId="${netstreamCorrelationId}">
+      |<switchServiceModificationInstruction switchServiceId="16" netstreamCorrelationId="$orderId">
       |  <features>
       |    <callerDisplay active="true"/>
       |    <ringBack active="true"/>
@@ -67,7 +67,7 @@ class KafkaSetupSpec extends FlatSpec with Matchers {
     val outputKafkaRecord: ProducerRecord[String, String] = topologyTestDriver.readOutput(outputTopic, keySerde.deserializer(), valueSerde.deserializer())
     val outputValue = outputKafkaRecord.value()
 
-    outputValue shouldEqual (expectedOutput)
+    outputValue shouldEqual expectedOutput
   }
 
 }

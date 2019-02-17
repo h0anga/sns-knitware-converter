@@ -7,14 +7,14 @@ import org.json4s.{Formats, NoTypeHints}
 class KnitwareConverter {
 
   def getXmlFor(textLine: String): String = {
-    println(s"input: ${textLine}")
+    println(s"input: $textLine")
     implicit val formats: Formats = Serialization.formats (NoTypeHints)
     val voiceFeatures = read[VoiceFeatures] (textLine)
-    println(s"vf: ${voiceFeatures.netstreamCorrelationId}")
+    println(s"vf: ${voiceFeatures.orderId}")
 
-    return s"""
+    s"""
       |<?xml version="1.0" encoding="UTF-8"?>
-      |<switchServiceModificationInstruction switchServiceId="16" netstreamCorrelationId="${voiceFeatures.netstreamCorrelationId}">
+      |<switchServiceModificationInstruction switchServiceId="16" netstreamCorrelationId="${voiceFeatures.orderId}">
       |  <features>
       |    <callerDisplay active="true"/>
       |    <ringBack active="true"/>
