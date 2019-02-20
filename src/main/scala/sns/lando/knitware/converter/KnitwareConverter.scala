@@ -11,8 +11,7 @@ class KnitwareConverter {
     implicit val formats: Formats = Serialization.formats (NoTypeHints)
     val voiceFeatures = read[VoiceFeatures] (textLine)
 
-    s"""
-      |<?xml version="1.0" encoding="UTF-8"?>
+    s"""|<?xml version="1.0" encoding="UTF-8"?>
       |<switchServiceModificationInstruction switchServiceId="16" netstreamCorrelationId="${voiceFeatures.modifyVoiceFeaturesInstruction.orderId}">
       |  <features>
       |${featuresToJson(voiceFeatures.modifyVoiceFeaturesInstruction.features)}
