@@ -31,7 +31,7 @@ class KafkaSetupSpec extends FlatSpec with Matchers {
 
   private val kafkaMessageInValue =
     s"""
-      |{"orderId":"$orderId"}
+       |{"modifyVoiceFeaturesInstruction":{"operatorId":"sky","orderId":"$orderId","serviceId":"31642339","operatorOrderId":"SogeaVoipModify_YHUORO","features":["CallerDisplay","RingBack","ChooseToRefuse"]}}
     """.stripMargin
 
 

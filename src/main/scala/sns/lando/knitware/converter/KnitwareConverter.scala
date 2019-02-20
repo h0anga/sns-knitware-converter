@@ -10,17 +10,18 @@ class KnitwareConverter {
     println(s"input: $textLine")
     implicit val formats: Formats = Serialization.formats (NoTypeHints)
     val voiceFeatures = read[VoiceFeatures] (textLine)
-    println(s"vf: ${voiceFeatures.orderId}")
 
     s"""
       |<?xml version="1.0" encoding="UTF-8"?>
-      |<switchServiceModificationInstruction switchServiceId="16" netstreamCorrelationId="${voiceFeatures.orderId}">
+      |<switchServiceModificationInstruction switchServiceId="16" netstreamCorrelationId="${voiceFeatures.modifyVoiceFeaturesInstruction.orderId}">
       |  <features>
-      |    <callerDisplay active="true"/>
-      |    <ringBack active="true"/>
-      |    <chooseToRefuse active="true"/>
+      |${featuresToJson(voiceFeatures.modifyVoiceFeaturesInstruction.features)}
       |  </features>
       |</switchServiceModificationInstruction>
     """.stripMargin
+  }
+
+  def featuresToJson(features: Seq[String]): String = {
+    features.map(f => s"""    <${f.head.toString.toLowerCase + f.tail} active="true"/>""").mkString("\n")
   }
 }
