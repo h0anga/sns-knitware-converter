@@ -12,15 +12,15 @@ class KnitwareConverter {
     val voiceFeatures = read[VoiceFeatures] (textLine)
 
     s"""|<?xml version="1.0" encoding="UTF-8"?>
-      |<switchServiceModificationInstruction switchServiceId="16" netstreamCorrelationId="${voiceFeatures.modifyVoiceFeaturesInstruction.orderId}">
+      |<switchServiceModificationInstruction switchServiceId="16" netstreamCorrelationId="${voiceFeatures.enrichedInstruction.orderId}">
       |  <features>
-      |${featuresToJson(voiceFeatures.modifyVoiceFeaturesInstruction.features)}
+      |${featuresToXml(voiceFeatures.enrichedInstruction.features)}
       |  </features>
       |</switchServiceModificationInstruction>
     """.stripMargin
   }
 
-  def featuresToJson(features: Seq[String]): String = {
+  def featuresToXml(features: Seq[String]): String = {
     features.map(f => s"""    <${f.head.toString.toLowerCase + f.tail} active="true"/>""").mkString("\n")
   }
 }
