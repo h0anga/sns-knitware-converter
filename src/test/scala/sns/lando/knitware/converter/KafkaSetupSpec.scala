@@ -36,8 +36,7 @@ class KafkaSetupSpec extends FlatSpec with Matchers {
 
 
   private val expectedOutput =
-    s"""
-      |<?xml version="1.0" encoding="UTF-8"?>
+    s"""|<?xml version="1.0" encoding="UTF-8"?>
       |<switchServiceModificationInstruction switchServiceId="16" netstreamCorrelationId="$orderId">
       |  <features>
       |    <callerDisplay active="true"/>
