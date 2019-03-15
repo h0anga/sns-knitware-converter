@@ -9,12 +9,12 @@ class KnitwareConverter {
   def getXmlFor(textLine: String): String = {
     println(s"input: $textLine")
     implicit val formats: Formats = Serialization.formats (NoTypeHints)
-    val voiceFeatures = read[VoiceFeatures] (textLine)
+    val enrichedInstruction = read[EnrichedInstruction] (textLine)
 
     s"""|<?xml version="1.0" encoding="UTF-8"?>
-      |<switchServiceModificationInstruction switchServiceId="16" netstreamCorrelationId="${voiceFeatures.enrichedInstruction.orderId}">
+      |<switchServiceModificationInstruction switchServiceId="${enrichedInstruction.SWITCH_SERVICE_ID}" netstreamCorrelationId="${enrichedInstruction.ORDER_ID}">
       |  <features>
-      |${featuresToXml(voiceFeatures.enrichedInstruction.features)}
+      |${featuresToXml(enrichedInstruction.FEATURES)}
       |  </features>
       |</switchServiceModificationInstruction>
     """.stripMargin
