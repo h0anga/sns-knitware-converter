@@ -2,18 +2,31 @@ package sns.lando.knitware.converter
 
 import java.util.Properties
 
+import brave.Tracing
+import brave.kafka.streams.KafkaStreamsTracing
+import brave.sampler.Sampler
 import org.apache.kafka.common.serialization._
 import org.apache.kafka.streams._
 import org.apache.kafka.streams.scala.kstream.Consumed
+import zipkin2.reporter.AsyncReporter
+import zipkin2.reporter.kafka11.KafkaSender
 
 class KafkaSetup(private val server: String, private val port: String) {
   private implicit val stringSerde: Serde[String] = Serdes.String()
 
   private var stream: KafkaStreams = _
+  private val bootstrapServers = server + ":" + port
+  private val tracing = setupTracing
+
+  def setupTracing: KafkaStreamsTracing = {
+    val sender = KafkaSender.newBuilder.bootstrapServers(bootstrapServers).build
+    val reporter = AsyncReporter.builder(sender).build
+    val tracing = Tracing.newBuilder.localServiceName("knitware-converter").sampler(Sampler.ALWAYS_SAMPLE).spanReporter(reporter).build
+    KafkaStreamsTracing.create(tracing)
+  }
 
   def start(inputTopicName: String, outputTopicName: String) = {
 
-    val bootstrapServers = server + ":" + port
 
     val streamingConfig = {
       val settings = new Properties
@@ -24,7 +37,7 @@ class KafkaSetup(private val server: String, private val port: String) {
       settings
     }
     val topology = build(inputTopicName, outputTopicName)
-    stream = new KafkaStreams(topology, streamingConfig)
+    stream = tracing.kafkaStreams(topology, streamingConfig)
     stream.start()
   }
 
