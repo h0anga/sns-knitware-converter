@@ -5,6 +5,8 @@ import java.util.Properties
 import brave.Tracing
 import brave.kafka.streams.KafkaStreamsTracing
 import brave.sampler.Sampler
+import org.apache.kafka.clients.consumer.ConsumerConfig
+import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.common.serialization._
 import org.apache.kafka.streams._
 import org.apache.kafka.streams.scala.kstream.Consumed
@@ -34,6 +36,8 @@ class KafkaSetup(private val server: String, private val port: String) {
       settings.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers)
       settings.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String.getClass.getName)
       settings.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String.getClass.getName)
+      settings.put(StreamsConfig.PRODUCER_PREFIX + ProducerConfig.INTERCEPTOR_CLASSES_CONFIG, "io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor")
+      settings.put(StreamsConfig.CONSUMER_PREFIX + ConsumerConfig.INTERCEPTOR_CLASSES_CONFIG, "io.confluent.monitoring.clients.interceptor.MonitoringConsumerInterceptor")
       settings
     }
     val topology = build(inputTopicName, outputTopicName)
