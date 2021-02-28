@@ -1,15 +1,16 @@
 package sns.lando.knitware.converter
 
 import java.util.{Properties, UUID}
-
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.{Serde, Serdes}
 import org.apache.kafka.streams.test.ConsumerRecordFactory
-import org.apache.kafka.streams.{StreamsConfig, Topology, TopologyTestDriver}
-import org.scalatest._
+import org.apache.kafka.streams.{StreamsConfig, TopologyTestDriver}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.must.Matchers
+import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 
-class KafkaSetupSpec extends FlatSpec with Matchers {
+class KafkaSetupSpec extends AnyFlatSpec with Matchers {
   private val kafkaApplicationId = "sns-knitware-converter"
   private val serverName = "serverName"
   private val portNumber = "portNumber"
@@ -28,16 +29,17 @@ class KafkaSetupSpec extends FlatSpec with Matchers {
   }
 
   private val orderId = UUID.randomUUID().toString
+  private val serviceId = UUID.randomUUID().toString
 
   private val kafkaMessageInValue =
     s"""
-       |{"modifyVoiceFeaturesInstruction":{"operatorId":"sky","orderId":"$orderId","serviceId":"31642339","operatorOrderId":"SogeaVoipModify_YHUORO","features":["CallerDisplay","RingBack","ChooseToRefuse"]}}
+       |{"modifyVoiceFeaturesInstruction":{"operatorId":"sky","orderId":"$orderId","serviceId":"$serviceId","operatorOrderId":"SogeaVoipModify_YHUORO","features":["CallerDisplay","RingBack","ChooseToRefuse"]}}
     """.stripMargin
 
 
   private val expectedOutput =
     s"""|<?xml version="1.0" encoding="UTF-8"?>
-      |<switchServiceModificationInstruction switchServiceId="16" netstreamCorrelationId="$orderId">
+      |<switchServiceModificationInstruction switchServiceId="$serviceId" netstreamCorrelationId="$orderId">
       |  <features>
       |    <callerDisplay active="true"/>
       |    <ringBack active="true"/>
@@ -68,5 +70,4 @@ class KafkaSetupSpec extends FlatSpec with Matchers {
 
     outputValue shouldEqual expectedOutput
   }
-
 }

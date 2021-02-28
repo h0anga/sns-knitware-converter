@@ -1,10 +1,17 @@
 package sns.lando.knitware.converter
 
-case class EnrichedInstruction(OPERATOR_ID: String,
-                               ORDER_ID: String,
-                               SERVICE_ID: String,
-                               DIRECTORY_NUMBER: String,
-                               OPERATOR_ORDER_ID: String,
-                               SWITCH_SERVICE_ID: String,
-                               FEATURES: Seq[String])
+case class EnrichedInstruction(modifyVoiceFeaturesInstruction:ModifyVoiceFeaturesInstruction)
 
+case class ModifyVoiceFeaturesInstruction(operatorId: String,
+                               orderId: String,
+                               serviceId: String,
+                               operatorOrderId: String,
+                               features: List[String])
+
+case class EnrichedInstruction1(operatorId: String,
+                               orderId: String,
+                               serviceId: String,
+                               directoryNumber: String,
+                               operatorOrderId: String,
+                               switchServiceId: String,
+                               features: Seq[String])
