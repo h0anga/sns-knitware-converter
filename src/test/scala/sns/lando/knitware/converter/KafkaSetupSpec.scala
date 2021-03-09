@@ -1,14 +1,12 @@
 package sns.lando.knitware.converter
 
-import java.util.{Properties, UUID}
-import org.apache.kafka.clients.consumer.ConsumerRecord
-import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.{Serde, Serdes}
-import org.apache.kafka.streams.test.ConsumerRecordFactory
-import org.apache.kafka.streams.{StreamsConfig, TopologyTestDriver}
+import org.apache.kafka.streams.{StreamsConfig, TestInputTopic, TestOutputTopic, TopologyTestDriver}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
+
+import java.util.{Properties, UUID}
 
 class KafkaSetupSpec extends AnyFlatSpec with Matchers {
   private val kafkaApplicationId = "sns-knitware-converter"
@@ -61,12 +59,11 @@ class KafkaSetupSpec extends AnyFlatSpec with Matchers {
     val keySerde: Serde[String] = Serdes.String
     val valueSerde: Serde[String] = Serdes.String
 
-    val consumerRecordFactory: ConsumerRecordFactory[String, String] = new ConsumerRecordFactory[String, String](inputTopic, keySerde.serializer(), valueSerde.serializer())
-    val inputKafkaRecord: ConsumerRecord[Array[Byte], Array[Byte]] = consumerRecordFactory.create(inputTopic, kafkaMessageInKey, kafkaMessageInValue)
-    topologyTestDriver.pipeInput(inputKafkaRecord)
+    val testServiceTopic: TestInputTopic[String, String] = topologyTestDriver.createInputTopic(inputTopic, keySerde.serializer(), valueSerde.serializer())
+    testServiceTopic.pipeInput(kafkaMessageInKey, kafkaMessageInValue)
 
-    val outputKafkaRecord: ProducerRecord[String, String] = topologyTestDriver.readOutput(outputTopic, keySerde.deserializer(), valueSerde.deserializer())
-    val outputValue = outputKafkaRecord.value()
+    val testOutputTopic: TestOutputTopic[String, String] = topologyTestDriver.createOutputTopic(outputTopic, keySerde.deserializer(), valueSerde.deserializer())
+    val outputValue = testOutputTopic.readValue()
 
     outputValue shouldEqual expectedOutput
   }

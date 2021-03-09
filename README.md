@@ -26,9 +26,10 @@ your minikube VM (its likely to be 192.168.99.1):
       kubectl get services
       ```
   - You can access your host service (kafka!) using that IP and the port (9092).
-  - Create the Environment variables the app needs within Kubernetes by running the following, substituting in your values for the server and port:
+  - Create the Environment variables the app needs within Kubernetes by running the following, 
+    substituting in your values for the server and port:
       ```
-        kubectl create configmap kafka-broker-config --from-literal=KAFKA_BROKER_SERVER=10.103.3.240 --from-literal=KAFKA_BROKER_PORT=9092
+        kubectl create configmap kafka-broker-config --from-literal=KAFKA_BROKER_SERVER=10.99.248.38 --from-literal=KAFKA_BROKER_PORT=9092
       ```  
 3) Build the docker image using miniKube's docker:
     ```
